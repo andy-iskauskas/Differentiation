@@ -1,3 +1,4 @@
+// Pinch a couple of Numbas functions, for ease of later use
 var compile = Numbas.jme.compile;
 var ttJME = Numbas.jme.display.treeToJME;
 
@@ -12,7 +13,9 @@ var ttJME = Numbas.jme.display.treeToJME;
 */
 function diff(input, arg)
 {
+  // Compiles a string to a syntax tree using NUMBAS
   var expr = compile(input);
+  // If the current token is a variable, check if it's the differentiating variable or not
   if (expr['tok'].type == "name")
   {
     if (expr['tok'].name == arg)
@@ -20,11 +23,15 @@ function diff(input, arg)
     else
       return "0";
   }
+  // If the current token is a number, return 0
   if (expr['tok'].type == "number")
     return "0";
+  // For any other types, distinguigh by their name
   var ename = expr['tok'].name;
+  // Unary minus
   if (ename == "-u")
     return "-1*("+diff(ttJME(expr.args[0]),arg)+")";
+  // Binary operations: according to differentiation rules, we differentiate its children and recombine
   if (expr['tok'].vars ==  "2")
   {
     var earg1 = ttJME(expr.args[0]);
@@ -37,10 +44,12 @@ function diff(input, arg)
       return "("+diff(earg1,arg)+")*("+earg2+")+("+earg1+")*("+diff(earg2,arg)+")";
     if (ename == "/")
       return "(("+diff(earg1,arg)+")*("+earg2+")-("+earg1+")*("+diff(earg2,arg)+"))/(("+earg2+")*("+earg2+"))";
+    // General form for differential of f(x)^g(x). Accounts for both stuff like x^n and e^x
     if (ename == "^")
       return "(("+earg1+")^("+earg2+"))*("+diff(earg2,arg)+"*ln("+earg1+")+((("+earg2+")*("+diff(earg1,arg)+"))/("+earg1+")))";
 
   }
+  // Function operations: sin, cos etc. Basically the chain rule.
   if (expr['tok'].type == "function")
   {
     var earg = ttJME(expr.args[0]);
@@ -75,11 +84,12 @@ function diff(input, arg)
   }
 }
 
+// The object wrapper for the Numbas extension
 Numbas.addExtension('Differentiation',['jme','jme-display','math'], function(di)
 {
   var diffScope = di.scope;
 
-  /** A wrapper for the recursive differentiation function.
+  /** A wrapper for the recursive differentiation function diff. Allows for multiple differentiation.
   *
   * @param {String} input The input expression
   * @param {String} arg The parameter to differentiate with respect to
@@ -99,6 +109,7 @@ Numbas.addExtension('Differentiation',['jme','jme-display','math'], function(di)
     return ttJME(Numbas.jme.display.simplify(expr,'all',Numbas.jme.builtinScope),{wrapexpressions: true});
   }
 
+  // General stuff for NUMBAS definitions. Just needed to make a function object that NUMBAS likes.
   var funcObj = Numbas.jme.funcObj;
   var TString = Numbas.jme.types.TString;
   var TNum = Numbas.jme.types.TNum;
