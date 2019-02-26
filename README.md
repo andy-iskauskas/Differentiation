@@ -1,7 +1,7 @@
 Differentiation Package
 =======================
 
-A <a href="https://www.Numbas.org.uk">Numbas</a> extension for differentiating functions. NUMBAS has a very good suite of checking functions for algebraic equivalence of a student's answer and the correct answer, but there are problems when setting questions on solutions to differential equations: for example, if the student chooses different names for constants of integration, then the answer will be marked incorrectly. To mark these sorts of questions, taking advantage of NUMBAS' buitl-in checking, and without using regular expressions, it's necessary to differentiate the student expression and plug it into the differential equation.
+A <a href="https://www.Numbas.org.uk">Numbas</a> extension for differentiating functions. NUMBAS has a very good suite of checking functions for algebraic equivalence of a student's answer and the correct answer, but there are problems when setting questions on solutions to differential equations: for example, if the student chooses different names for constants of integration, then the answer will be marked incorrectly. To mark these sorts of questions, taking advantage of NUMBAS' built-in checking, and without using regular expressions, it's necessary to differentiate the student expression and plug it into the differential equation.
 
 ## JavaScript Functions
 Quite minimal!
