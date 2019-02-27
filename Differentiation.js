@@ -58,29 +58,57 @@ function diff(input, arg)
     if (ename == "cos")
       return "-1*("+diff(earg,arg)+")*sin("+earg+")";
     if (ename == "tan")
-      return "("+diff(earg,arg)+")/(cos("+earg+")^2)";
+      return "("+diff(earg,arg)+")*(1/(cos("+earg+")^2))";
     if (ename == "arcsin")
-      return "("+diff(earg,arg)+")/sqrt(1-("+earg+")^2)";
+      return "("+diff(earg,arg)+")*(1/sqrt(1-("+earg+")^2))";
     if (ename == "arccos")
-      return "-1*("+diff(earg,arg)+")/sqrt(1-("+earg+")^2)";
+      return "-1*("+diff(earg,arg)+")*(1/sqrt(1-("+earg+")^2))";
     if (ename == "arctan")
-      return "("+diff(earg,arg)+")/(1+("+earg+")^2)";
+      return "("+diff(earg,arg)+")*(1/(1+("+earg+")^2))";
     if (ename == "sinh")
       return "("+diff(earg,arg)+")*cosh("+earg+")";
     if (ename == "cosh")
       return "("+diff(earg,arg)+")*sinh("+earg+")";
     if (ename == "tanh")
-      return "("+diff(earg,arg)+")/(cosh("+earg+")^2)";
+      return "("+diff(earg,arg)+")*(1/(cosh("+earg+")^2))";
     if (ename == "arcsinh")
-      return "("+diff(earg,arg)+")/sqrt(1+("+earg+")^2)";
+      return "("+diff(earg,arg)+")*(1/sqrt(1+("+earg+")^2))";
     if (ename == "arccosh")
-      return "("+diff(earg,arg)+")/sqrt(("+earg+")^2-1)";
+      return "("+diff(earg,arg)+")*(1/sqrt(("+earg+")^2-1))";
     if (ename == "arctanh")
-      return "("+diff(earg,arg)+")/(1-("+earg+")^2)";
+      return "("+diff(earg,arg)+")*(1/(1-("+earg+")^2))";
     if (ename == "ln")
-      return "("+diff(earg,arg)+")/("+earg+")";
+      return "("+diff(earg,arg)+")*(1/("+earg+"))";
     if (ename == "sqrt")
-      return "("+diff(earg,arg)+")/(2*sqrt("+earg+"))";
+      return "("+diff(earg,arg)+")*(1/(2*sqrt("+earg+")))";
+    // Reciprocal trig functions: sec, cosec, etc.
+    if (ename == "sec")
+      var toDiff = "(1/cos("+earg+"))";
+    if (ename == "cosec")
+      var toDiff = "(1/sin("+earg+"))";
+    if (ename == "cot")
+      var toDiff = "(1/tan("+earg+"))";
+    if (ename == "sech")
+      var toDiff = "(1/cosh("+earg+"))";
+    if (ename == "cosech")
+      var toDiff = "(1/sinh("+earg+"))";
+    if (ename == "coth")
+      var toDiff = "(1/tanh("+earg+"))";
+    // Slight difference with arcsec, etc: note that arcsec(x)=arccos(1/x)
+    if (ename == "arcsec")
+      var toDiff = "arccos(1/("+earg+"))";
+    if (ename == "arccosec")
+      var toDiff = "arcsin(1/("+earg+"))";
+    if (ename == "arccot")
+      var toDiff = "arctan(1/("+earg+"))";
+    if (ename == "arcsech")
+      var toDiff = "arccosh(1/("+earg+"))";
+    if (ename == "arccosech")
+      var toDiff = "arcsinh(1/("+earg+"))";
+    if (ename == "arccoth")
+      var toDiff = "arctanh(1/("+earg+"))";
+    if (typeof toDiff !== undefined)
+      return "("+diff(toDiff,arg)+")";
   }
 }
 
