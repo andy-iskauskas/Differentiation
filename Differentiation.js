@@ -107,8 +107,7 @@ function diff(input, arg)
       var toDiff = "arcsinh(1/("+earg+"))";
     if (ename == "arccoth")
       var toDiff = "arctanh(1/("+earg+"))";
-    if (typeof toDiff !== undefined)
-      return "("+diff(toDiff,arg)+")";
+    return "(" + ename + "\'(" + earg + "))";
   }
 }
 
@@ -134,7 +133,7 @@ Numbas.addExtension('Differentiation',['jme','jme-display','math'], function(di)
     {
       expr = diff(expr,arg);
     }
-    return ttJME(Numbas.jme.display.simplify(expr,'all',Numbas.jme.builtinScope),{wrapexpressions: true});
+    return Numbas.jme.display.simplifyExpression(expr,'all',Numbas.jme.builtinScope);
   }
 
   // General stuff for NUMBAS definitions. Just needed to make a function object that NUMBAS likes.
