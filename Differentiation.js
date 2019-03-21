@@ -26,7 +26,7 @@ function diff(input, arg)
   // If the current token is a number, return 0
   if (expr['tok'].type == "number")
     return "0";
-  // For any other types, distinguigh by their name
+  // For any other types, distinguish by their name
   var ename = expr['tok'].name;
   // Unary minus
   if (ename == "-u")
@@ -107,7 +107,18 @@ function diff(input, arg)
       var toDiff = "arcsinh(1/("+earg+"))";
     if (ename == "arccoth")
       var toDiff = "arctanh(1/("+earg+"))";
-    return "(" + ename + "\'(" + earg + "))";
+    /* If it doesn't fit into one of the above, then it's probably a generic function
+    * f(x): so return f'(x).
+    * Could do with making this more clever: eg d('f(x)','x',6) returns f''''''(x).
+    * Really want f^(6)(x)! The below commented code does't seem to do what's wanted, as regards
+    * formatting the output string correctly.
+    */
+    /* if (ename.match(/\'\'/)!=null)
+      return ename.replace(/\'\'/,"^\{\(3\)\}") + "(" + earg + ")";
+    else if (ename.match(/\{\(\d\)\}/)!=null)
+      return ename.replace(/\{\((\d)\)\}/,$1+1) + "(" + earg + ")";
+    else */
+      return "(" + ename + "\'(" + earg + "))";
   }
 }
 
@@ -141,5 +152,5 @@ Numbas.addExtension('Differentiation',['jme','jme-display','math'], function(di)
   var TString = Numbas.jme.types.TString;
   var TNum = Numbas.jme.types.TNum;
 
-  diffScope.addFunction(new funcObj('d',[TString,TString,TNum],TString, function(input,arg,n){return d(input,arg,n);},{unwrapValues:true}));
+  diffScope.addFunction(new funcObj('d',[TString,TString,TNum],TString, function(input,arg,n){return d(input,arg,n);}));
 })
