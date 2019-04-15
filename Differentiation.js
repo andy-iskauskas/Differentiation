@@ -53,6 +53,8 @@ function diff(input, arg)
   if (expr['tok'].type == "function")
   {
     var earg = ttJME(expr.args[0]);
+    if (ename == "exp")
+      return "("+diff("e^("+earg+")",arg)+")";
     if (ename == "sin")
       return "("+diff(earg,arg)+")*cos("+earg+")";
     if (ename == "cos")
@@ -122,6 +124,20 @@ function diff(input, arg)
   }
 }
 
+// Additional simplification rules for results of differentiation.
+var extraRules = [
+  ['ln(e)',[],'1'], // Log evaluations: ln(e)=1 and ln(x^y)=yln(x)
+  ['ln((?;x)^(?;y))',[],'y*ln(x)'],
+  ['(?;x)*((?;y)/(?;z))',[],'(x*y)/z'], // Combine fractions a*(b/c)=(a*b)/c
+  ['(?;x)*((?;mult)/((?;y)^(?;n)))',['canonical_compare(x,y)=0'],'mult/x^(1-n)'], // Cancel powers x^n*(a/x^m)=a x^(n-m)
+  ['(?;x)^(?;n)*((?;mult)/((?;y)))',['canonical_compare(x,y)=0'],'mult*x^(n-1)'],
+  ['(?;x)^(?;n)*((?;mult)/((?;y)^(?;m)))',['canonical_compare(x,y)=0'],'mult*x^(n-m)'],
+  ['(?;x)/((?;y)*(?;z))',['canonical_compare(x,y)=0'],'1/z'], // Cancel things like x/(4x)=1/4
+  ['(?;x)/((?;y)*(?;z))',['canonical_compare(x,z)=0'],'1/y'],
+  ['((?;o))*((?;x))',['(x isa "name") and (o isa "op")'],'x*o'] // Move variables eg x,y,... ahead of functions eg e^(x), cos(x),..
+];
+Numbas.jme.rules.simplificationRules['diffrules']=Numbas.jme.rules.compileRules(extraRules,'diffrules'); // Compile these rules
+
 // The object wrapper for the Numbas extension
 Numbas.addExtension('Differentiation',['jme','jme-display','math'], function(di)
 {
@@ -144,7 +160,7 @@ Numbas.addExtension('Differentiation',['jme','jme-display','math'], function(di)
     {
       expr = diff(expr,arg);
     }
-    return Numbas.jme.display.simplifyExpression(expr,'all',Numbas.jme.builtinScope);
+    return Numbas.jme.display.simplifyExpression(expr,['diffrules','all'],Numbas.jme.builtinScope);
   }
 
   // General stuff for NUMBAS definitions. Just needed to make a function object that NUMBAS likes.
@@ -152,5 +168,5 @@ Numbas.addExtension('Differentiation',['jme','jme-display','math'], function(di)
   var TString = Numbas.jme.types.TString;
   var TNum = Numbas.jme.types.TNum;
 
-  diffScope.addFunction(new funcObj('d',[TString,TString,TNum],TString, function(input,arg,n){return d(input,arg,n);}));
+  diffScope.addFunction(new funcObj('d',[TString,TString,TNum],TString, function(input,arg,n){return Numbas.jme.display.simplifyExpression(d(input,arg,n),['diffrules','all'],Numbas.jme.builtinScope);}));
 })
