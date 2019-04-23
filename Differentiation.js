@@ -134,7 +134,8 @@ var extraRules = [
   ['(?;x)^(?;n)*((?;mult)/((?;y)^(?;m)))',['canonical_compare(x,y)=0'],'mult*x^(n-m)'],
   ['(?;x)/((?;y)*(?;z))',['canonical_compare(x,y)=0'],'1/z'], // Cancel things like x/(4x)=1/4
   ['(?;x)/((?;y)*(?;z))',['canonical_compare(x,z)=0'],'1/y'],
-  ['((?;o))*((?;x))',['(x isa "name") and (o isa "op")'],'x*o'] // Move variables eg x,y,... ahead of functions eg e^(x), cos(x),..
+  ['((?;o))*((?;x))',['(x isa "name") and (o isa "op")'],'x*o'], // Move variables eg x,y,... ahead of functions eg e^(x), cos(x),..
+  ['((?;y)^(?;n))*((?;x)^(?;m))',['(x isa "name") and (y isa "name") and canonical_compare(y,x)=-1'],'(x^m)*(y^n)']
 ];
 Numbas.jme.rules.simplificationRules['diffrules']=Numbas.jme.rules.compileRules(extraRules,'diffrules'); // Compile these rules
 
@@ -158,9 +159,9 @@ Numbas.addExtension('Differentiation',['jme','jme-display','math'], function(di)
       return expr;
     for (i=0; i<ind; i++)
     {
-      expr = diff(expr,arg);
+      expr = Numbas.jme.display.simplifyExpression(diff(expr,arg),['diffrules','all'],Numbas.jme.builtinScope);
     }
-    return Numbas.jme.display.simplifyExpression(expr,['diffrules','all'],Numbas.jme.builtinScope);
+    return expr;
   }
 
   // General stuff for NUMBAS definitions. Just needed to make a function object that NUMBAS likes.
