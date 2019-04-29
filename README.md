@@ -11,13 +11,13 @@ Quite minimal!
 - Trigonometric functions sin, cos, tan and inverses arcsin, arcos, arctan
 - Hyperbolic trig sinh, cosh, tanh...arcsinh, arccosh, arctanh
 - sqrt and ln
-Takes two parameters: a string corresponding to the expression to differentiate, and an argument to differentiate with respect to.
+Takes three parameters: a string corresponding to the expression to differentiate, an argument to differentiate with respect to, and a number of times to differentiate the expression.
 Example:
 ```JavaScript
-diff("x^2","x")
-// Returns '2x'
+diff("x^3","x",2)
+// Returns '6x'
 ```
-...actually, this is a bit of a lie. It returns an expression algebraically equivalent to 2x: it actually returns x^2*(2/x). But same difference.
+There are also a series of additional simplification rules applied to the answer at the end of each round of differentiation, to deal with the result of the differentiation: for example, `d("x^2","x",1)` initially outputs `2x*(1/x)`, which is clearly not in simplest form (and causes problems if you want to perform multiple differentiations). These are collected as a set `diffrules`, which can be subsequently used in any questions that use this extension.
 This is implictly partial differentiation: if a student gives an answer A*e^(2t), then `diff(...,'x')` treats the A as constant, as it rightly should.
 
 ## NUMBAS Functions
@@ -29,7 +29,7 @@ Relatively self-explanatory: use `d(expression,argument,number)` anywhere differ
 ### Suggestions
 Any feedback or suggestions for improvement would be great: a working list of things to do are
 - Test further to ensure all code is behaving as it should!
-- Think about making the output easier to deal with: at present the string output has to be run through expression to display in latex form, and it is not simplified in a useful way
+- Think about making the output easier to deal with: at present the string output has to be run through expression to display in latex form.
 - Ensure that there are no important mathematical functions missing from the extension
 - Modify the custom part type: need to ensure for nth-order ODEs that there are n linearly independent solutions (not currently checking this)
 - Consider integration (much much harder)
