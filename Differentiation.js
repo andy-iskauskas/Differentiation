@@ -24,7 +24,7 @@ function diff(input, arg)
       return "0";
   }
   // If the current token is a number, return 0
-  if (expr['tok'].type == "number")
+  if (expr['tok'].type == "number" || expr['tok'].type == "integer")
     return "0";
   // For any other types, distinguish by their name
   var ename = expr['tok'].name;
@@ -37,13 +37,13 @@ function diff(input, arg)
     var earg1 = ttJME(expr.args[0]);
     var earg2 = ttJME(expr.args[1]);
     if (ename == "+")
-      return "(" + diff(earg1,arg)+")+("+diff(earg2,arg)+")";
+      return "((" + diff(earg1,arg)+")+("+diff(earg2,arg)+"))";
     if (ename == "-")
-      return "("+diff(earg1,arg)+")-("+diff(earg2,arg)+")";
+      return "(("+diff(earg1,arg)+")-("+diff(earg2,arg)+"))";
     if (ename == "*")
-      return "("+diff(earg1,arg)+")*("+earg2+")+("+earg1+")*("+diff(earg2,arg)+")";
+      return "(("+diff(earg1,arg)+")*("+earg2+")+("+earg1+")*("+diff(earg2,arg)+"))";
     if (ename == "/")
-      return "(("+diff(earg1,arg)+")*("+earg2+")-("+earg1+")*("+diff(earg2,arg)+"))/(("+earg2+")*("+earg2+"))";
+      return "((("+diff(earg1,arg)+")*("+earg2+")-("+earg1+")*("+diff(earg2,arg)+"))/(("+earg2+")*("+earg2+")))";
     // General form for differential of f(x)^g(x). Accounts for both stuff like x^n and e^x
     if (ename == "^")
       return "(("+earg1+")^("+earg2+"))*("+diff(earg2,arg)+"*ln("+earg1+")+((("+earg2+")*("+diff(earg1,arg)+"))/("+earg1+")))";
@@ -128,14 +128,14 @@ function diff(input, arg)
 var extraRules = [
   ['ln(e)',[],'1'], // Log evaluations: ln(e)=1 and ln(x^y)=yln(x)
   ['ln((?;x)^(?;y))',[],'y*ln(x)'],
-  ['(?;x)*((?;y)/(?;z))',[],'(x*y)/z'], // Combine fractions a*(b/c)=(a*b)/c
-  ['(?;x)*((?;mult)/((?;y)^(?;n)))',['canonical_compare(x,y)=0'],'mult/x^(1-n)'], // Cancel powers x^n*(a/x^m)=a x^(n-m)
-  ['(?;x)^(?;n)*((?;mult)/((?;y)))',['canonical_compare(x,y)=0'],'mult*x^(n-1)'],
-  ['(?;x)^(?;n)*((?;mult)/((?;y)^(?;m)))',['canonical_compare(x,y)=0'],'mult*x^(n-m)'],
-  ['(?;x)/((?;y)*(?;z))',['canonical_compare(x,y)=0'],'1/z'], // Cancel things like x/(4x)=1/4
-  ['(?;x)/((?;y)*(?;z))',['canonical_compare(x,z)=0'],'1/y'],
-  ['((?;o))*((?;x))',['(x isa "name") and (o isa "op")'],'x*o'], // Move variables eg x,y,... ahead of functions eg e^(x), cos(x),..
-  ['((?;y)^(?;n))*((?;x)^(?;m))',['(x isa "name") and (y isa "name") and canonical_compare(y,x)=-1'],'(x^m)*(y^n)']
+  // A set of rules to deal with quotients of powers.
+  ['?;=x/?;=x','acg','1'], // x/x=1
+  ['?;x/(?;y/?;z)','acg','((x*z)/(y))'], // x/(y/z)=xz/y
+  ['(?;x/?;y)/?;z','acg','x/(y*z)'], // (x/y)/z=x/yz
+  ['(?;x/?;y)*(?;z/?;w)','acg','(x*z)/(y*w)'], // x/y z/w = xz/yw
+  ['?;=x^$n;n/?;=x^$n;m `| (?;=x/x^$n;m);n:1 `| (?;=x^$n;n/?;=x);m:1','acg', 'x^eval(n-m)'], // x^n/x^m = x^(n-m)
+  ['?;=x^$n;n * ?;=x^$n;m `| (?;=x*?;=x^$n;m);n:1 `| (?;=x^$n;n * ?;=x);m:1','acg','(x^eval(n+m))'], //x^n x^m = x^(m+n)
+  ['?;rest * ?;x^(-$n;n) `| ?;x^(-$n;n);rest:1','acg','rest/(x^n)'] // a x^(-n) = a/x^n
 ];
 Numbas.jme.rules.simplificationRules['diffrules']=Numbas.jme.rules.compileRules(extraRules,'diffrules'); // Compile these rules
 
