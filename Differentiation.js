@@ -135,7 +135,11 @@ var extraRules = [
   ['(?;x/?;y)*(?;z/?;w)','acg','(x*z)/(y*w)'], // x/y z/w = xz/yw
   ['?;=x^$n;n/?;=x^$n;m `| (?;=x/x^$n;m);n:1 `| (?;=x^$n;n/?;=x);m:1','acg', 'x^eval(n-m)'], // x^n/x^m = x^(n-m)
   ['?;=x^$n;n * ?;=x^$n;m `| (?;=x*?;=x^$n;m);n:1 `| (?;=x^$n;n * ?;=x);m:1','acg','(x^eval(n+m))'], //x^n x^m = x^(m+n)
-  ['?;rest * ?;x^(-$n;n) `| ?;x^(-$n;n);rest:1','acg','rest/(x^n)'] // a x^(-n) = a/x^n
+  ['?;rest * ?;x^(-$n;n) `| ?;x^(-$n;n);rest:1','acg','rest/(x^n)'], // a x^(-n) = a/x^n
+  // Dealing with fractions of variables (similar to simplifyFractions)
+  ['?;x*1/?;y','acg','x/y'],
+  ['(?;=x * ?;y)/?;=x `| (?;y * ?;=x)/?;=x','ag','y'], // xy/x = y
+  ['(?;=x)/(?;=x * ?;y) `| (?;=x)/(?;y * ?;=x)','ag','1/y'] // x/xy = 1/y
 ];
 Numbas.jme.rules.simplificationRules['diffrules']=Numbas.jme.rules.compileRules(extraRules,'diffrules'); // Compile these rules
 
