@@ -146,6 +146,8 @@ Numbas.jme.rules.simplificationRules['diffrules']=Numbas.jme.rules.compileRules(
 // This is a quick and dirty fix for the problem with zeroFactor and collectNumbers looping endlessly!
 Numbas.jme.rules.simplificationRules['all']['rules'][17]['options']['associative'] = false;
 Numbas.jme.rules.simplificationRules['zeroFactor']['rules'][0]['options']['associative'] = false;
+Numbas.jme.rules.simplificationRules['all']['rules'][8]['options']['associative'] = false;
+Numbas.jme.rules.simplificationRules['basic']['rules'][8]['options']['associative'] = false;
 
 // The object wrapper for the Numbas extension
 Numbas.addExtension('Differentiation',['jme','jme-display','math'], function(di)
