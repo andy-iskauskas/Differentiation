@@ -141,7 +141,8 @@ var extraRules = [
   ['(?;=x * ?;y)/?;=x `| (?;y * ?;=x)/?;=x','ag','y'], // xy/x = y
   ['(?;=x)/(?;=x * ?;y) `| (?;=x)/(?;y * ?;=x)','ag','1/y'] // x/xy = 1/y
 ];
-Numbas.jme.rules.simplificationRules['diffrules']=Numbas.jme.rules.compileRules(extraRules,'diffrules'); // Compile these rules
+
+var diffRules = Numbas.jme.rules.compileRules(extraRules,'diffrules'); // Compile these rules
 
 // This is a quick and dirty fix for the problem with zeroFactor and collectNumbers looping endlessly!
 Numbas.jme.rules.simplificationRules['all']['rules'][17]['options']['associative'] = false;
@@ -153,6 +154,7 @@ Numbas.jme.rules.simplificationRules['basic']['rules'][8]['options']['associativ
 Numbas.addExtension('Differentiation',['jme','jme-display','math'], function(di)
 {
   var diffScope = di.scope;
+  Numbas.jme.builtinScope.rulesets['diffrules'] = diffRules;
 
   /** A wrapper for the recursive differentiation function diff. Allows for multiple differentiation.
   *
@@ -169,7 +171,7 @@ Numbas.addExtension('Differentiation',['jme','jme-display','math'], function(di)
       return expr;
     for (i=0; i<ind; i++)
     {
-      expr = Numbas.jme.display.simplifyExpression(diff(expr,arg),['diffrules','all'],Numbas.jme.builtinScope);
+      expr = Numbas.jme.display.simplifyExpression(diff(expr,arg),['all','diffrules'],Numbas.jme.builtinScope);
     }
     return expr;
   }
@@ -179,5 +181,5 @@ Numbas.addExtension('Differentiation',['jme','jme-display','math'], function(di)
   var TString = Numbas.jme.types.TString;
   var TNum = Numbas.jme.types.TNum;
 
-  diffScope.addFunction(new funcObj('d',[TString,TString,TNum],TString, function(input,arg,n){return Numbas.jme.display.simplifyExpression(d(input,arg,n),['diffrules','all'],Numbas.jme.builtinScope);}));
+  diffScope.addFunction(new funcObj('d',[TString,TString,TNum],TString, function(input,arg,n){return Numbas.jme.display.simplifyExpression(d(input,arg,n),['all','diffrules'], Numbas.jme.builtinScope);}));
 })
