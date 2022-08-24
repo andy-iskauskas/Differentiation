@@ -1,3 +1,5 @@
+**This package is deprecated, and no longer supported by NUMBAS - use the `jme.calculus` built-in functionality instead!** 
+
 Differentiation Package
 =======================
 
